@@ -1,0 +1,32 @@
+<template>
+    <div>
+        {{value}}
+        <input type="text" v-model="value" placeholder="Type here to change value" />
+    </div>
+</template>
+
+<script>
+import socket from 'web/static/js/socket';
+
+export default {
+    data() {
+        return {
+            value: ""
+        }
+    },
+    mounted() {
+        this.channel = socket.channel("<%= singular %>:lobby", {});
+        this.channel.join()
+            .receive("ok", resp => console.log(resp))
+            .receive("error", resp => console.log(resp));
+        this.channel.on("value", payload => {
+            this.serverText = payload.value;
+        });
+    },
+    methods: {
+        add() {
+            this.channel.push("add", { value: this.value });
+        }
+    }
+};
+</script>

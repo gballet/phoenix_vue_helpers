@@ -1,0 +1,16 @@
+<template>
+    <div>
+        <h1>Welcome to the root component of <%= base %></h1>
+
+        In order to change this component, edit web/static/components/App.vue
+    </div>
+</template>
+
+<script>
+export default {
+    data() {
+        return {}
+    },
+    components: {}
+};
+</script>
