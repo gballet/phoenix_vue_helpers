@@ -40,7 +40,7 @@ defmodule Mix.Tasks.PhoenixVueHelpers.Install do
     end
 
     defp paths do
-        [".", :phoenix_vue]
+        [".", :phoenix_vue_helpers]
     end
 
     # Imports Vue into `app.js` if it is not already present.
@@ -48,14 +48,14 @@ defmodule Mix.Tasks.PhoenixVueHelpers.Install do
         if Regex.match?(~r/import Vue from 'vue\/dist\/vue';/, appjs) do
             appjs
         else
-            "import Vue from 'vue/dist/vue';\n"
+            appjs <> "\nimport Vue from 'vue/dist/vue';\n"
         end
     end
 
     # Ask the user if they want a scaffolded root component
     defp add_root_component?(appjs) do
         if Mix.shell.yes?("Scaffold the app by adding a root component?") do
-            add_root_component(appjs)
+            appjs <> add_root_component(appjs)
         else
             appjs
         end
