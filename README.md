@@ -20,7 +20,7 @@ end
 Add Vue to your project by typing:
 
 ```
-$ mix phoenix.vue.install
+$ mix phoenix_vue_helpers.install
 ```
 
 It will ask you if you want to add a root component. Assuming that you haven't done
@@ -29,7 +29,7 @@ so yet, it is recommended to say yes.
 You can add more components by typing:
 
 ```
-$ mix phoenix.gen.vue.component FooComponent
+$ mix phoenix_vue_helpers.gen.component FooComponent
 ```
 
 And a `FooComponent.vue` file will be generated in `web/static/components`.

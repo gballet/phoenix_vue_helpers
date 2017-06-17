@@ -3,7 +3,7 @@ defmodule PhoenixVueHelpers.Mixfile do
 
   def project do
     [app: :phoenix_vue_helpers,
-     version: "0.1.0",
+     version: "0.1.1",
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -11,8 +11,8 @@ defmodule PhoenixVueHelpers.Mixfile do
      package: [
          contributors: ["Guillaume Ballet"],
          maintainers: ["Guillaume Ballet"],
-         licences: ["The Unlicense"],
-         links: %{github: "TODO"},
+         licenses: ["The Unlicense"],
+         links: %{github: "https://github.com/gballet/phoenix_vue_helpers"},
          files: ~w(lib priv mix.exs UNLICENSE)
      ],
      description: """
@@ -41,7 +41,8 @@ defmodule PhoenixVueHelpers.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-        {:phoenix, "~> 1.2.4"}
+        {:phoenix, "~> 1.2.4"},
+        {:ex_doc, "~> 0.14", only: :dev}
     ]
   end
 end
