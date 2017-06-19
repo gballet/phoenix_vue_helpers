@@ -1,6 +1,11 @@
 defmodule Mix.Tasks.PhoenixVueHelpers.Install do
     use Mix.Task
 
+    @moduledoc """
+    Install all vue dependencies into a phoenix project, and optionally adds a
+    root component in the project.
+    """
+
     @npmBaseDependencies ["vue"]
     @npmDevDependencies ["vue-brunch", "babel-plugin-transform-runtime"]
 

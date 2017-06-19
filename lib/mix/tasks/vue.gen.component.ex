@@ -4,7 +4,7 @@ defmodule Mix.Tasks.PhoenixVueHelpers.Gen.Component do
     @moduledoc """
     Generate a vue component.
 
-        mix phoenix.gen.vue.component Component
+        mix phoenix_vue_helpers.gen.component Component
 
     The generated component will be added to web/static/components with a `.vue`
     extension.
