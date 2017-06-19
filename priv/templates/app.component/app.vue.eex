@@ -3,14 +3,29 @@
         <h1>Welcome to the root component of <%= base %></h1>
 
         In order to change this component, edit web/static/components/App.vue
+
+        <%= if vue_router do %>
+            <% for route <- routes do %>
+                <router-link to="/<%=route%>"><%= String.capitalize(route) %></router-link>
+            <% end %>
+            <router-view></router-view>
+        <% end %>
     </div>
 </template>
 
 <script>
+<% for route <- routes do %>
+import <%= String.capitalize(route) %>RouteComponent from 'web/static/components/<%= String.capitalize(route) %>RouteComponent.vue';
+<% end %>
+
 export default {
     data() {
         return {}
     },
-    components: {}
+    components: {
+        <% for route <- routes do %>
+            <%= String.capitalize(route) %>RouteComponent,
+        <% end %>
+    }
 };
 </script>

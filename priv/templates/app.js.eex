@@ -1,0 +1,6 @@
+
+import Vue from 'vue/dist/vue';
+<%= if vue_router do %>
+import VueRouter from 'vue-router';
+Vue.use(VueRouter);
+<% end %>

@@ -1,0 +1,12 @@
+import App from 'web/static/components/App.vue';
+<%= if vue_router do %>import routes from 'web/static/js/routes.config.js';
+
+const router = new VueRouter({
+    routes
+});<% end %>
+
+new Vue({
+    el: "app",
+    components: {App}<%= if vue_router do %>,
+    router<% end %>
+});

@@ -1,0 +1,8 @@
+export default [
+<% for route <- routes do %>
+    {
+        path: '/<%= route %>',
+        component: <%= String.capitalize(route) %>RouteComponent
+    }
+<% end %>
+];

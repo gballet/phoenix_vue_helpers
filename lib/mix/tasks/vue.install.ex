@@ -1,20 +1,26 @@
 defmodule Mix.Tasks.PhoenixVueHelpers.Install do
     use Mix.Task
 
-    @npmDependencies ["vue"]
+    @npmBaseDependencies ["vue"]
     @npmDevDependencies ["vue-brunch", "babel-plugin-transform-runtime"]
 
     @shortdoc "Install Vuejs support into this phoenix project"
 
-    @appjs_path "web/static/js/app.js"
+    @jsstatic_path "web/static/js"
+    @appjs_path "#{@jsstatic_path}/app.js"
     @apphtml_path "web/templates/layout/app.html.eex"
     @components_path "web/static/components"
     @indexhtml_path "web/templates/page/index.html.eex"
 
-    def run(_args) do
-        # Add npm dependencies
-        if Mix.shell.cmd("npm install --save #{Enum.join(@npmDependencies, " ")}") != 0, do: Mix.raise "Error installing npm packages. Please copy the npm output above when reporting a bug."
-        if Mix.shell.cmd("npm install --save-dev #{Enum.join(@npmDevDependencies, " ")}") != 0, do: Mix.raise "Error installing npm packages. Please copy the npm output above when reporting a bug."
+    def run(args) do
+        config = %{npm_deps: @npmBaseDependencies, npm_dev_deps: @npmDevDependencies}
+                |> add_router?
+                |> routes_specified?(args)
+                |> add_root_component?
+
+        # Install npm dependencies
+        if Mix.shell.cmd("npm install --save #{Enum.join(config[:npm_deps], " ")}") != 0, do: Mix.raise "Error installing npm packages. Please copy the npm output above when reporting a bug."
+        if Mix.shell.cmd("npm install --save-dev #{Enum.join(config[:npm_dev_deps], " ")}") != 0, do: Mix.raise "Error installing npm packages. Please copy the npm output above when reporting a bug."
 
         # Add brunch configuration to load `.vue` files
         if File.exists?("brunch-config.js") do
@@ -35,7 +41,9 @@ defmodule Mix.Tasks.PhoenixVueHelpers.Install do
         end
 
         # Add vue import to app.js
-        appjs = File.read!(@appjs_path) |> add_vue_import |> add_root_component?
+        appjs = File.read!(@appjs_path)
+            |> add_vue_imports(config)
+            |> add_root_component(config)
         File.write!(@appjs_path, appjs)
     end
 
@@ -44,44 +52,51 @@ defmodule Mix.Tasks.PhoenixVueHelpers.Install do
     end
 
     # Imports Vue into `app.js` if it is not already present.
-    defp add_vue_import(appjs) do
-        if Regex.match?(~r/import Vue from 'vue\/dist\/vue';/, appjs) do
-            appjs
-        else
-            appjs <> "\nimport Vue from 'vue/dist/vue';\n"
-        end
+    defp add_vue_imports(appjs, config) do
+        init_code = EEx.eval_file "#{Application.app_dir(:phoenix_vue_helpers)}/priv/templates/app.js.eex", Map.to_list(config)
+        app_code = String.split(appjs, "\n")
+        uniques = String.split(init_code, "\n") -- app_code
+
+        Enum.join(app_code ++ uniques, "\n")
+    end
+
+    defp add_router?(config) do
+        config
+        |> Map.put(:vue_router, Mix.shell.yes?("Use vue router ?"))
+        |> Map.put(:npm_deps, config[:npm_deps] ++ ["vue-router"])
     end
 
     # Ask the user if they want a scaffolded root component
-    defp add_root_component?(appjs) do
-        if Mix.shell.yes?("Scaffold the app by adding a root component?") do
-            appjs <> add_root_component(appjs)
+    defp add_root_component?(config) do
+        Map.put(config, :root_component, Mix.shell.yes?("Scaffold the app by adding a root component?"))
+    end
+
+    defp routes_specified?(config, args) do
+        if false do
+
         else
-            appjs
+            Map.put(config, :routes, [])
         end
     end
 
     # Effectively add the root component to the project's config files.
-    defp add_root_component(appjs) do
-        binding = Mix.Phoenix.inflect("app")
+    defp add_root_component(appjs, config) do
+        if config[:root_component] do
+            params = Mix.Phoenix.inflect("app") ++ Map.to_list(config)
 
-        Mix.Phoenix.copy_from paths(), "priv/templates/app.component", "", binding, [
-            {:eex, "app.vue.eex", "#{@components_path}/App.vue"}
-        ]
+            Mix.Phoenix.copy_from paths(), "priv/templates/app.component", "", params, [
+                {:eex, "app.vue.eex", "#{@components_path}/App.vue"}
+            ] ++ (if config[:vue_router], do: [{:eex, "routes.config.js.eex", "#{@jsstatic_path}/routes.config.js"}], else: [])
 
-        # TODO Alternatively, propose to use vue-router2, in which case it's the app
-        # layout file that needs to be updated, index.html.eex doesn't even need to
-        # exist.
-        indexhtml = File.read!(@indexhtml_path) |> String.replace(~r{\n<div class="row marketing">(.*\n)+</div>\n?$}, "<app></app>")
-        File.write(@indexhtml_path, indexhtml)
+            # TODO Alternatively, propose to use vue-router2, in which case it's the app
+            # layout file that needs to be updated, index.html.eex doesn't even need to
+            # exist.
+            indexhtml = File.read!(@indexhtml_path) |> String.replace(~r{\n<div class="row marketing">(.*\n)+</div>\n?$}, "<app></app>")
+            File.write(@indexhtml_path, indexhtml)
 
-        """
-        import App from 'web/static/components/App.vue';
-
-        new Vue({
-            el: "app",
-            components: {App}
-        });
-        """
+            appjs <> "\n" <> EEx.eval_file("#{Application.app_dir(:phoenix_vue_helpers)}/priv/templates/root_component.js.eex", params)
+        else
+            appjs
+        end
     end
 end
