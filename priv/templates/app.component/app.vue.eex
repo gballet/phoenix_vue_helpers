@@ -2,30 +2,28 @@
     <div>
         <h1>Welcome to the root component of <%= base %></h1>
 
-        In order to change this component, edit web/static/components/App.vue
-
+        <p>In order to change this component, edit web/static/components/App.vue</p>
         <%= if vue_router do %>
-            <% for route <- routes do %>
-                <router-link to="/<%=route%>"><%= String.capitalize(route) %></router-link>
-            <% end %>
+            <p>Here are the different routes that you configured:</p>
+            <ul>
+                <%= for {aliaS, path} <- routes do %>
+                    <li><router-link to="/<%=path%>"><%= aliaS %></router-link><br></li>
+                <% end %>
+            </ul>
             <router-view></router-view>
         <% end %>
     </div>
 </template>
 
-<script>
-<% for route <- routes do %>
-import <%= String.capitalize(route) %>RouteComponent from 'web/static/components/<%= String.capitalize(route) %>RouteComponent.vue';
-<% end %>
+<script><%= for {aliaS, path} <- routes do %>
+import <%= aliaS %>RouteComponent from 'web/static/components/<%= aliaS %>RouteComponent.vue';<% end %>
 
 export default {
     data() {
         return {}
     },
-    components: {
-        <% for route <- routes do %>
-            <%= String.capitalize(route) %>RouteComponent,
-        <% end %>
+    components: {<%= for {aliaS, path} <- routes do %>
+        <%= aliaS %>RouteComponent,<% end %>
     }
 };
 </script>

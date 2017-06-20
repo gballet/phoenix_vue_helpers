@@ -1,0 +1,10 @@
+<template>
+    <div>
+        Template for <%= route_name %>, please update me in web/static/components/<%= route_module %>RouteComponent.vue
+    </div>
+</template>
+
+<script>
+export default {
+};
+</script>

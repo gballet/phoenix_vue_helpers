@@ -77,8 +77,8 @@ defmodule Mix.Tasks.PhoenixVueHelpers.Install do
     end
 
     defp routes_specified?(config, args) do
-        if false do
-
+        if length(args) > 0 do
+            Map.put(config, :routes, Enum.map(args, fn route -> bindings = Mix.Phoenix.inflect(route); {bindings[:alias], bindings[:path]} end))
         else
             Map.put(config, :routes, [])
         end
@@ -92,6 +92,12 @@ defmodule Mix.Tasks.PhoenixVueHelpers.Install do
             Mix.Phoenix.copy_from paths(), "priv/templates/app.component", "", params, [
                 {:eex, "app.vue.eex", "#{@components_path}/App.vue"}
             ] ++ (if config[:vue_router], do: [{:eex, "routes.config.js.eex", "#{@jsstatic_path}/routes.config.js"}], else: [])
+
+            for {alias_name, path_name } <- config[:routes] do
+                File.write!(
+                    "#{@components_path}/#{alias_name}RouteComponent.vue",
+                    EEx.eval_file("#{Application.app_dir(:phoenix_vue_helpers)}/priv/templates/default.component.vue.eex", [route_name: path_name, route_module: alias_name]))
+            end
 
             # TODO Alternatively, propose to use vue-router2, in which case it's the app
             # layout file that needs to be updated, index.html.eex doesn't even need to

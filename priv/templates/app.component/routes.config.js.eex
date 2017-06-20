@@ -1,8 +1,9 @@
-export default [
-<% for route <- routes do %>
-    {
-        path: '/<%= route %>',
-        component: <%= String.capitalize(route) %>RouteComponent
-    }
+<%= for {aliaS, path} <- routes do %>import <%= aliaS %>RouteComponent from 'web/static/components/<%= aliaS %>RouteComponent.vue';
 <% end %>
+
+export default [<%= for {aliaS, path} <- routes do %>
+    {
+        path: '/<%= path %>',
+        component: <%= aliaS %>RouteComponent
+    },<% end %>
 ];
