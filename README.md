@@ -17,14 +17,29 @@ end
 
 ## Getting started
 
+### Without `vue-router`
+
 Add Vue to your project by typing:
 
 ```
 $ mix phoenix_vue_helpers.install
 ```
 
-It will ask you if you want to add a root component. Assuming that you haven't done
+It will ask you if you want to add a default component. Assuming that you haven't done
 so yet, it is recommended to say yes.
+
+### Using `vue-router`
+
+Add the list of routes when calling `phoenix_vue_helpers.install`. Route names can
+be with camel case or snake case.
+
+```
+$ mix phoenix_vue_helpers.install home todos profile_page
+```
+
+As in the previous case, you will be asked if you want components files to be generated.
+
+### Adding more components
 
 You can add more components by typing:
 
@@ -36,5 +51,6 @@ And a `FooComponent.vue` file will be generated in `web/static/components`.
 
 ## TODO
 
-- [ ] `vue-router2` integration
+- [x] `vue-router` integration
 - [ ] socket integration
+- [ ] login integration with ueberauth

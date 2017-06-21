@@ -2,8 +2,8 @@ defmodule Mix.Tasks.PhoenixVueHelpers.Install do
     use Mix.Task
 
     @moduledoc """
-    Install all vue dependencies into a phoenix project, and optionally adds a
-    root component in the project.
+    Install all vue dependencies into a phoenix project, and optionally adds
+    default components to the project.
     """
 
     @npmBaseDependencies ["vue"]
@@ -21,7 +21,7 @@ defmodule Mix.Tasks.PhoenixVueHelpers.Install do
         config = %{npm_deps: @npmBaseDependencies, npm_dev_deps: @npmDevDependencies}
                 |> add_router?
                 |> routes_specified?(args)
-                |> add_root_component?
+                |> add_default_component?
 
         # Install npm dependencies
         if Mix.shell.cmd("npm install --save #{Enum.join(config[:npm_deps], " ")}") != 0, do: Mix.raise "Error installing npm packages. Please copy the npm output above when reporting a bug."
@@ -48,7 +48,7 @@ defmodule Mix.Tasks.PhoenixVueHelpers.Install do
         # Add vue import to app.js
         appjs = File.read!(@appjs_path)
             |> add_vue_imports(config)
-            |> add_root_component(config)
+            |> add_default_component(config)
         File.write!(@appjs_path, appjs)
     end
 
@@ -71,9 +71,9 @@ defmodule Mix.Tasks.PhoenixVueHelpers.Install do
         |> Map.put(:npm_deps, config[:npm_deps] ++ ["vue-router"])
     end
 
-    # Ask the user if they want a scaffolded root component
-    defp add_root_component?(config) do
-        Map.put(config, :root_component, Mix.shell.yes?("Scaffold the app by adding a root component?"))
+    # Ask the user if they want a scaffolded default component
+    defp add_default_component?(config) do
+        Map.put(config, :default_component, Mix.shell.yes?("Scaffold the app by adding default components?"))
     end
 
     defp routes_specified?(config, args) do
@@ -84,9 +84,9 @@ defmodule Mix.Tasks.PhoenixVueHelpers.Install do
         end
     end
 
-    # Effectively add the root component to the project's config files.
-    defp add_root_component(appjs, config) do
-        if config[:root_component] do
+    # Effectively add the default component to the project's config files.
+    defp add_default_component(appjs, config) do
+        if config[:default_component] do
             params = Mix.Phoenix.inflect("app") ++ Map.to_list(config)
 
             Mix.Phoenix.copy_from paths(), "priv/templates/app.component", "", params, [
